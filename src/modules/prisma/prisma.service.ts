@@ -1,16 +1,17 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
 import { exec } from 'child_process';
 import { DATABASE_URL } from '@config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@prisma/client';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   constructor() {
-    super({
-      datasources: {
-        db: { url: DATABASE_URL },
-      },
+    const adapter = new PrismaPg({
+      connectionString: DATABASE_URL,
     });
+
+    super({ adapter });
   }
   private readonly maxRetries = 10; // Qayta urinish maksimal soni
   private readonly retryDelay = 1500; // Qayta urinish orasidagi kutish vaqti (ms)
@@ -36,7 +37,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         await this.$connect();
         console.log('Prisma client successfully connected to the database.');
         return;
-      } catch (error) {
+      } catch {
         retries++;
         console.error(`Prisma client connection attempt ${retries} failed.`);
         // if([3, 6, 9].includes(retries)) this.exec()

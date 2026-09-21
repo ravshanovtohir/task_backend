@@ -2,7 +2,7 @@ import { APP_PORT } from './config';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import * as basicAuth from 'express-basic-auth';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -24,7 +24,6 @@ async function bootstrap() {
       challenge: true,
       users: {
         '1': '1',
-        'happy_tel': 'happy_tel',
       },
     }),
   );

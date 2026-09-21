@@ -4,7 +4,7 @@ import { config } from './validate.config';
 const APP_PORT = config.get<string>('APP_PORT') ?? 1721;
 
 //database
-const DATABASE_URL = config.get<string>('DATABASE_URL') ?? ''
+const DATABASE_URL = config.get<string>('DATABASE_URL') ?? '';
 
 //jwt
 const JWT_ACCESS_SECRET = config.get<string>('JWT_ACCESS_SECRET') ?? '';

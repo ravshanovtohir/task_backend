@@ -1,9 +1,17 @@
 import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto';
+import { LoginRequestDto } from './dto';
+import { PrismaService } from '@prisma';
 
 @Injectable()
 export class AuthService {
-  findAll() {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async findAll() {
     return `This action returns all auth`;
+  }
+
+  async login(data: LoginRequestDto) {
+    void data;
+    throw new Error('Login is not implemented yet.');
   }
 }

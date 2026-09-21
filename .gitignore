@@ -5,6 +5,10 @@
 /lib
 *.tsbuildinfo
 
+# generated tools
+/src/generated/prisma
+/skills-lock.json
+
 # Logs
 logs
 *.log
@@ -54,7 +58,5 @@ pids
 *.seed
 *.pid.lock
 
-# Diagnostic reports (https://nodejs.org/api/report.html)
+# Diagnostic reports
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-
-/src/generated/prisma

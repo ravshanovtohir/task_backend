@@ -1,7 +1,9 @@
 import { validate } from '@config';
+import { ResponseInterceptor } from '@interceptors';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import {PrismaModule, AuthModule } from '@modules'
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { PrismaModule, AuthModule } from '@modules';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -10,10 +12,15 @@ import {PrismaModule, AuthModule } from '@modules'
       envFilePath: '.env',
     }),
     PrismaModule,
-    AuthModule
+    AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+  ],
   exports: [],
 })
 export class AppModule {}

@@ -1,6 +1,5 @@
-import { Controller, Get} from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto'
 
 @Controller('auth')
 export class AuthController {
@@ -9,5 +8,10 @@ export class AuthController {
   @Get()
   findAll() {
     return this.authService.findAll();
+  }
+
+  @Post('login')
+  async login() {
+    return;
   }
 }
