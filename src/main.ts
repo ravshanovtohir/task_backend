@@ -2,8 +2,12 @@ import { APP_PORT } from './config';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import * as basicAuth from 'express-basic-auth';
-import { VersioningType } from '@nestjs/common';
+import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import {
+  I18nValidationExceptionFilter,
+  I18nValidationPipe,
+} from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,6 +21,21 @@ async function bootstrap() {
     type: VersioningType.URI,
     prefix: 'api/v',
   });
+
+
+  app.useGlobalPipes(
+    new I18nValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+    }),
+  );
+
+  app.useGlobalFilters(
+    new I18nValidationExceptionFilter({
+      detailedErrors: false,
+    }),
+  );
 
   app.use(
     '/docs',

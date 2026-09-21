@@ -4,6 +4,9 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule, AuthModule } from '@modules';
+import { StaffModule } from './staff/staff.module';
+import { AcceptLanguageResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
+import { join } from 'path';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -11,8 +14,18 @@ import { PrismaModule, AuthModule } from '@modules';
       validate,
       envFilePath: '.env',
     }),
+    I18nModule.forRoot({
+      fallbackLanguage: 'uz',
+      loader: I18nJsonLoader,
+      loaderOptions: {
+        path: join(__dirname, 'i18n'),
+        watch: true,
+      },
+      resolvers: [AcceptLanguageResolver],
+    }),
     PrismaModule,
     AuthModule,
+    StaffModule,
   ],
   controllers: [],
   providers: [
@@ -23,4 +36,4 @@ import { PrismaModule, AuthModule } from '@modules';
   ],
   exports: [],
 })
-export class AppModule {}
+export class AppModule { }

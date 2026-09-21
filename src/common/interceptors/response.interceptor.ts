@@ -1,9 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Observable, map } from 'rxjs';
-
-import { RESPONSE_MESSAGE_KEY } from '@decorators';
 
 export interface PaginatedResult<T> {
   data: T;
@@ -45,31 +42,19 @@ export class CustomResponse<T> {
   @ApiProperty({ type: Number })
   statusCode: number;
 
-  @ApiProperty({ type: String })
-  message: string;
-
   @ApiProperty({ description: 'Response payload' })
   result: T;
-
-  @ApiPropertyOptional({ type: String })
-  error?: string;
 }
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
-  constructor(private readonly reflector: Reflector) {}
-
   intercept(context: ExecutionContext, next: CallHandler): Observable<CustomResponse<unknown>> {
     return next.handle().pipe(
       map((data: unknown) => {
         const response = context.switchToHttp().getResponse<{ statusCode: number }>();
-        const message =
-          this.reflector.getAllAndOverride<string>(RESPONSE_MESSAGE_KEY, [context.getHandler(), context.getClass()]) ??
-          'Success';
 
         return {
           statusCode: response.statusCode,
-          message,
           result: isPaginatedResult(data)
             ? new PaginationResponse(data.data, data.totalItems, data.currentPage, data.perPage)
             : data,
@@ -89,9 +74,11 @@ function isPaginatedResult(value: unknown): value is PaginatedResult<unknown> {
   return (
     'data' in result &&
     typeof result.totalItems === 'number' &&
-    Number.isFinite(result.totalItems) &&
+    Number.isInteger(result.totalItems) &&
+    result.totalItems >= 0 &&
     typeof result.currentPage === 'number' &&
     Number.isInteger(result.currentPage) &&
+    result.currentPage >= 1 &&
     typeof result.perPage === 'number' &&
     Number.isInteger(result.perPage) &&
     result.perPage > 0
