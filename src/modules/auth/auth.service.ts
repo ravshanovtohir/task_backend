@@ -1,11 +1,16 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateAuthDto, LoginRequestDto } from './dto';
-import { PrismaService } from '@prisma';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '@prisma';
+import { JwtService } from '@nestjs/jwt';
+import { CreateAuthDto, LoginRequestDto } from './dto';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { JWT_ACCESS_SECRET, JWT_REFRESH_EXPIRE_TIME, JWT_REFRESH_SECRET } from '@config';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService
+  ) { }
 
   async findAll() {
     return `This action returns all auth`;
@@ -50,5 +55,38 @@ export class AuthService {
     if (!isMatch) {
       throw new UnauthorizedException('Недействительные учетные данные!');
     }
+
+    const accessToken = this.accessTokenGenerator(staff.id)
+    const refreshToken = this.refreshTokenGenerator(staff.id)
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken
+    }
+  }
+
+  private accessTokenGenerator(staffId: number): string {
+    const accessToken = this.jwtService.sign(
+      {
+        id: staffId
+      },
+      {
+        secret: JWT_ACCESS_SECRET,
+      }
+    )
+    return accessToken
+  }
+
+  private refreshTokenGenerator(staffId: number): string {
+    const refreshToken = this.jwtService.sign(
+      {
+        id: staffId
+      },
+      {
+        secret: JWT_REFRESH_SECRET,
+        expiresIn: JWT_REFRESH_EXPIRE_TIME,
+      }
+    )
+    return refreshToken
   }
 }

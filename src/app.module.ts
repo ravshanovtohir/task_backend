@@ -3,8 +3,7 @@ import { ResponseInterceptor } from '@interceptors';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { PrismaModule, AuthModule } from '@modules';
-import { StaffModule } from './staff/staff.module';
+import { PrismaModule, AuthModule, RoleModule, StaffModule } from '@modules';
 import { AcceptLanguageResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
 @Module({
@@ -23,9 +22,10 @@ import { join } from 'path';
       },
       resolvers: [AcceptLanguageResolver],
     }),
-    PrismaModule,
     AuthModule,
+    RoleModule,
     StaffModule,
+    PrismaModule,
   ],
   controllers: [],
   providers: [
@@ -36,4 +36,4 @@ import { join } from 'path';
   ],
   exports: [],
 })
-export class AppModule { }
+export class AppModule {}

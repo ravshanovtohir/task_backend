@@ -4,10 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import * as basicAuth from 'express-basic-auth';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import {
-  I18nValidationExceptionFilter,
-  I18nValidationPipe,
-} from 'nestjs-i18n';
+import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -21,7 +18,6 @@ async function bootstrap() {
     type: VersioningType.URI,
     prefix: 'api/v',
   });
-
 
   app.useGlobalPipes(
     new I18nValidationPipe({
