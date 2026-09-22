@@ -54,8 +54,8 @@ model StaffRole {
   assigner Staff? @relation("AssignedBy", fields: [assignedBy], references: [id])
 }
 
-model adminSession {
-  id               Int      @id @default(autoincrement())
+model Session {
+  id               String   @id @default(uuid()) @db.Uuid
   staffId          Int      @map("staff_id")
   refreshTokenHash String   @map("refresh_token_hash")
   ipAddress        String   @map("ip_address")
@@ -66,4 +66,7 @@ model adminSession {
   staff Staff @relation(fields: [staffId], references: [id])
 
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(5)
+
+  @@index([staffId, isActive])
+  @@map("staff_session")
 }

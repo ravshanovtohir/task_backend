@@ -5,6 +5,8 @@ import { PrismaModule } from '@prisma';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWT_ACCESS_EXPIRE_TIME, JWT_ACCESS_SECRET } from '@config';
+import { AuthRepository } from './auth.repository';
+import { RedisService } from '@helpers';
 
 @Module({
   imports: [
@@ -19,6 +21,6 @@ import { JWT_ACCESS_EXPIRE_TIME, JWT_ACCESS_SECRET } from '@config';
     PrismaModule
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, AuthRepository, RedisService],
 })
 export class AuthModule {}
