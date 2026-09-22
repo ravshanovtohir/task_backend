@@ -39,11 +39,17 @@ export class PaginationResponse<T> {
 }
 
 export class CustomResponse<T> {
-  @ApiProperty({ type: Number })
-  statusCode: number;
+  @ApiProperty({ example: true })
+  success: boolean;
+
+  @ApiProperty({ example: '' })
+  message: string;
+
+  @ApiProperty({ type: Number, example: 200 })
+  code: number;
 
   @ApiProperty({ description: 'Response payload' })
-  result: T;
+  data: T;
 }
 
 @Injectable()
@@ -54,8 +60,10 @@ export class ResponseInterceptor implements NestInterceptor {
         const response = context.switchToHttp().getResponse<{ statusCode: number }>();
 
         return {
-          statusCode: response.statusCode,
-          result: isPaginatedResult(data)
+          success: true,
+          message: '',
+          code: response.statusCode,
+          data: isPaginatedResult(data)
             ? new PaginationResponse(data.data, data.totalItems, data.currentPage, data.perPage)
             : data,
         };

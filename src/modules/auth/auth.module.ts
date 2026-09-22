@@ -7,6 +7,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JWT_ACCESS_EXPIRE_TIME, JWT_ACCESS_SECRET } from '@config';
 import { AuthRepository } from './auth.repository';
 import { RedisService } from '@helpers';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from '../../common/strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -18,9 +20,12 @@ import { RedisService } from '@helpers';
       }),
       inject: [ConfigService],
     }),
-    PrismaModule
+    PassportModule.register({
+      defaultStrategy: 'jwt',
+    }),
+    PrismaModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthRepository, RedisService],
+  providers: [AuthService, AuthRepository, RedisService, JwtStrategy],
 })
 export class AuthModule {}

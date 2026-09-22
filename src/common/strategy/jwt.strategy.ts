@@ -1,22 +1,55 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IUser } from '@interfaces';
+import { PrismaService } from '@prisma';
+import { RedisService } from '@helpers';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private readonly prisma: PrismaService,
+    private readonly redisService: RedisService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_AT_SECRET'),
+      secretOrKey: configService.get<string>('JWT_ACCESS_SECRET'),
     });
   }
-  validate(payload: IUser): IUser {
+  async validate(payload: IUser) {
+    const [staff, activeSessionId] = await Promise.all([
+      this.prisma.staff.findUnique({
+        where: { id: payload.id },
+        select: {
+          id: true,
+          roles: {
+            select: {
+              role: {
+                select: {
+                  key: true,
+                },
+              },
+            },
+          },
+        },
+      }),
+      this.redisService.get(`admin:active_session:${payload.id}`),
+    ]);
+
+    if (!staff) {
+      throw new UnauthorizedException('Пользователь не найден.');
+    }
+
+    if (!activeSessionId || activeSessionId !== String(payload.sid)) {
+      throw new UnauthorizedException('Сессия недействительна или отозвана.');
+    }
+
     return {
-      id: +payload.id,
-      username: payload.username,
-      role: payload.role,
+      id: +staff.id,
+      sid: payload.sid,
+      roles: staff.roles.map((item) => item.role.key),
     };
   }
 }

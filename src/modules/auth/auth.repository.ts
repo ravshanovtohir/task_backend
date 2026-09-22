@@ -1,23 +1,21 @@
-import { Injectable } from "@nestjs/common";
-import { PrismaService } from "@prisma";
-import { adminSession } from "@prisma/client";
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '@prisma';
+import { Session } from '@prisma/client';
 
 @Injectable()
 export class AuthRepository {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async deActivateAllSessions(staffId: number): Promise<number> {
     const affectedCount = await this.prisma.$executeRaw`
-      UPDATE admin_session
+      UPDATE staff_session
       SET 
         is_active = false
       WHERE 
         staff_id = ${staffId} AND is_active = true
       ;
-    `
-    return affectedCount
+    `;
+    return affectedCount;
   }
 
   async creaetNewSession(data: {
@@ -27,9 +25,9 @@ export class AuthRepository {
     userAgent?: string;
     isActive: boolean;
     expiresAt: Date;
-  }){
-    const [createdSession] = await this.prisma.$queryRaw<adminSession[]>`
-      INSERT INTO admin_session (
+  }) {
+    const [createdSession] = await this.prisma.$queryRaw<Session[]>`
+      INSERT INTO staff_session (
         staff_id,
         refresh_token_hash,
         ip_address,
@@ -49,35 +47,64 @@ export class AuthRepository {
       )
       RETURNING
       id
-    `
+    `;
 
-    return createdSession
+    return createdSession;
   }
 
   async findByTokenHash(hash: string) {
-    return this.prisma.adminSession.findFirst(
-      {
-         where: {
-          refreshTokenHash: hash
-         }
-      }
-    )
-  }
-
-  async findSessionById(id: number){
-    return this.prisma.adminSession.findUnique({
-      where: { 
-        id: id 
+    return this.prisma.session.findFirst({
+      where: {
+        refreshTokenHash: hash,
       },
     });
   }
 
-  async deactivateSession(sessionId: number){
-    return this.prisma.adminSession.update({
+  async findSessionById(id: string) {
+    return this.prisma.session.findUnique({
       where: {
-         id: sessionId 
+        id: id,
+      },
+    });
+  }
+
+  async deactivateSession(sessionId: string) {
+    return this.prisma.session.update({
+      where: {
+        id: sessionId,
       },
       data: { isActive: false },
+    });
+  }
+
+  async getStaffById(staffId: number) {
+    return this.prisma.staff.findUnique({
+      where: {
+        id: staffId,
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        createdAt: true,
+        roles: {
+          select: {
+            role: {
+              select: {
+                key: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async updateRefreshTokenHash(sessionId: string, refreshTokenHash: string) {
+    return this.prisma.session.update({
+      where: { id: sessionId },
+      data: { refreshTokenHash },
     });
   }
 }

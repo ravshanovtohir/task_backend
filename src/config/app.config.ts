@@ -20,10 +20,9 @@ const ADMIN_EMAIL = config.get<string>('ADMIN_EMAIL') ?? '';
 const ADMIN_PASSWORD = config.get<string>('ADMIN_PASSWORD') ?? '';
 
 // Redis
-const REDIS_HOST = config.get<string>('REDIS_HOST') ?? ""
-const REDIS_PORT = +(config.get<number>('REDIS_PORT') ?? 6379)
-const REDIS_PASSWORD = config.get<string>('REDIS_PASSWORD') ?? ""
-
+const REDIS_HOST = config.get<string>('REDIS_HOST') ?? '';
+const REDIS_PORT = +(config.get<number>('REDIS_PORT') ?? 6379);
+const REDIS_PASSWORD = config.get<string>('REDIS_PASSWORD') ?? '';
 
 export {
   APP_PORT,
@@ -37,5 +36,5 @@ export {
   ADMIN_PASSWORD,
   REDIS_HOST,
   REDIS_PORT,
-  REDIS_PASSWORD
+  REDIS_PASSWORD,
 };

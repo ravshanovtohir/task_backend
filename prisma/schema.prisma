@@ -19,8 +19,8 @@ model Staff {
   password  String
 
   roles         StaffRole[]
-  assignedRoles StaffRole[]    @relation("AssignedBy")
-  sessions      adminSession[]
+  assignedRoles StaffRole[] @relation("AssignedBy")
+  sessions      Session[]
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(5)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(5)
@@ -40,6 +40,8 @@ model Role {
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(5)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(5)
   deletedAt DateTime? @updatedAt @map("deleted_at") @db.Timestamptz(5)
+
+  @@map("role")
 }
 
 model StaffRole {
@@ -52,10 +54,12 @@ model StaffRole {
   role     Role   @relation(fields: [roleId], references: [id])
   staff    Staff  @relation(fields: [staffId], references: [id])
   assigner Staff? @relation("AssignedBy", fields: [assignedBy], references: [id])
+
+  @@map("staff_role")
 }
 
 model Session {
-  id               String   @id @default(uuid()) @db.Uuid
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   staffId          Int      @map("staff_id")
   refreshTokenHash String   @map("refresh_token_hash")
   ipAddress        String   @map("ip_address")

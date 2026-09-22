@@ -16,12 +16,8 @@ export class AuthService {
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
     private readonly authRepository: AuthRepository,
-    private readonly redisService: RedisService
-  ) { }
-
-  async findAll() {
-    return `This action returns all auth`;
-  }
+    private readonly redisService: RedisService,
+  ) {}
 
   async validate(email: string) {
     const staff = await this.prisma.staff.findUnique({
@@ -50,7 +46,7 @@ export class AuthService {
     };
   }
 
-  async login(data: LoginRequestDto, meta: {ip: string, userAgent: string}) {
+  async login(data: LoginRequestDto, meta: { ip: string; userAgent: string }) {
     const staff = await this.validate(data.login);
 
     if (!staff) {
@@ -63,7 +59,7 @@ export class AuthService {
       throw new UnauthorizedException('Недействительные учетные данные!');
     }
 
-    await this.authRepository.deActivateAllSessions(staff.id)
+    await this.authRepository.deActivateAllSessions(staff.id);
 
     const newRefreshToken = crypto.randomBytes(64).toString('hex');
     const refreshTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
@@ -76,8 +72,8 @@ export class AuthService {
       ipAddress: meta.ip,
       userAgent: meta.userAgent,
       isActive: true,
-      expiresAt
-    })
+      expiresAt,
+    });
 
     await this.redisService.set(
       `admin:active_session:${staff.id}`,
@@ -85,24 +81,91 @@ export class AuthService {
       this.REFRESH_EXPIRES_IN_SECONDS,
     );
 
-    const accessToken = this.accessTokenGenerator(staff.id, session.id)
+    const accessToken = this.accessTokenGenerator(staff.id, session.id);
 
     return {
       access_token: accessToken,
-      refresh_token: newRefreshToken
-    }
+      refresh_token: newRefreshToken,
+    };
   }
 
-  private accessTokenGenerator(staffId: number, sid: number): string {
+  async getMe(staffId: number) {
+    const staff = await this.authRepository.getStaffById(staffId);
+    return {
+      id: staff.id,
+      first_name: staff.firstName,
+      last_name: staff.lastName,
+      email: staff.email,
+      roles: staff.roles.map((item) => item.role.key),
+      created_at: staff.createdAt,
+    };
+  }
+
+  private accessTokenGenerator(staffId: number, sid: string): string {
     const accessToken = this.jwtService.sign(
       {
         id: staffId,
-        sid: sid
+        sid: sid,
       },
       {
         secret: JWT_ACCESS_SECRET,
-      }
-    )
-    return accessToken
+      },
+    );
+    return accessToken;
+  }
+
+  async refresh(refreshToken: string) {
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    const session = await this.authRepository.findByTokenHash(refreshTokenHash);
+
+    if (!session || !session.isActive || session.expiresAt.getTime() <= Date.now()) {
+      throw new UnauthorizedException('Сессия недействительна или срок её действия истёк.');
+    }
+
+    const activeSessionId = await this.redisService.get(`admin:active_session:${session.staffId}`);
+
+    if (activeSessionId !== session.id) {
+      throw new UnauthorizedException('Сессия была завершена после входа с другого устройства.');
+    }
+
+    const newRefreshToken = crypto.randomBytes(64).toString('hex');
+
+    const newRefreshTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
+
+    // Refresh token rotation: eski token endi ishlamaydi.
+    await this.authRepository.updateRefreshTokenHash(session.id, newRefreshTokenHash);
+
+    const redisTtl = Math.max(1, Math.floor((session.expiresAt.getTime() - Date.now()) / 1000));
+
+    await this.redisService.set(`admin:active_session:${session.staffId}`, session.id, redisTtl);
+
+    const accessToken = this.accessTokenGenerator(session.staffId, session.id);
+
+    return {
+      access_token: accessToken,
+      refresh_token: newRefreshToken,
+    };
+  }
+
+  async logout(staffId: number, sessionId: string) {
+    const session = await this.authRepository.findSessionById(sessionId);
+
+    if (!session || session.staffId !== staffId || !session.isActive) {
+      throw new UnauthorizedException('Сессия не найдена или уже завершена.');
+    }
+
+    await this.authRepository.deactivateSession(session.id);
+
+    const redisKey = `admin:active_session:${staffId}`;
+    const activeSessionId = await this.redisService.get(redisKey);
+
+    if (activeSessionId === session.id) {
+      await this.redisService.delete(redisKey);
+    }
+
+    return {
+      message: 'Вы успешно вышли из системы.',
+    };
   }
 }

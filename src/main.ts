@@ -44,8 +44,8 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('Happy Tel API')
-    .setDescription('The Happy Tel API description')
+    .setTitle('Task Backend API')
+    .setDescription('The Task Backend API description')
     .setVersion('1.0')
     .addBearerAuth({
       type: 'http',

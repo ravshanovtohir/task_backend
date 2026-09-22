@@ -66,9 +66,7 @@ async function firstSeeder() {
     });
 
     if (adminExists) {
-      console.log(
-        'Администратор уже существует. Создание администратора пропущено.',
-      );
+      console.log('Администратор уже существует. Создание администратора пропущено.');
       return;
     }
 
@@ -97,7 +95,6 @@ async function firstSeeder() {
 
   console.log('Системные роли успешно проверены и созданы.');
 }
-
 
 firstSeeder()
   .catch((error: unknown) => {
