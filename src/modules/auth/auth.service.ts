@@ -6,7 +6,7 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { JWT_ACCESS_SECRET, JWT_REFRESH_EXPIRE_TIME, JWT_REFRESH_SECRET } from '@config';
 import { AuthRepository } from './auth.repository';
 import * as crypto from 'crypto';
-import { RedisService } from '@helpers';
+import { RedisService } from '@redis';
 
 @Injectable()
 export class AuthService {

@@ -32,7 +32,8 @@
       "@interceptors": ["./src/common/interceptors"],
       "@pipes": ["./src/common/pipes"],
       "@http": ["./src/http"],
-      "@modules": ["./src/modules"]
+      "@modules": ["./src/modules"],
+      "@redis": ["./src/modules/redis"]
     }
   },
   "include": ["src/**/*.ts"],

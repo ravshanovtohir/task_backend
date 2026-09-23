@@ -4,7 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IUser } from '@interfaces';
 import { PrismaService } from '@prisma';
-import { RedisService } from '@helpers';
+import { RedisService } from '@redis';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(

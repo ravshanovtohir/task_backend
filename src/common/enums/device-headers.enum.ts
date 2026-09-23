@@ -2,6 +2,7 @@ import { IsEnum, IsOptional } from 'class-validator';
 import type { ParameterObject } from '@nestjs/swagger';
 
 enum Lang {
+  uz = 'uz',
   ru = 'ru',
   en = 'en',
 }
@@ -15,10 +16,10 @@ export class DeviceHeadersDto {
 export const globalHeaderParametrs: ParameterObject[] = [
   {
     in: 'header',
-    name: 'lang',
+    name: 'Accept-Language',
     required: false,
     schema: {
-      enum: ['ru', 'en'],
+      enum: ['uz', 'ru'],
       type: 'string',
       default: 'ru',
     },

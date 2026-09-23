@@ -5,6 +5,8 @@ import * as basicAuth from 'express-basic-auth';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { AllExceptionsFilter } from '@exceptions';
+import { globalHeaderParametrs } from '@enums';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,7 +18,7 @@ async function bootstrap() {
 
   app.enableVersioning({
     type: VersioningType.URI,
-    prefix: 'api/v',
+    prefix: 'api/',
   });
 
   app.useGlobalPipes(
@@ -28,11 +30,18 @@ async function bootstrap() {
   );
 
   app.useGlobalFilters(
+    new AllExceptionsFilter(),
+
     new I18nValidationExceptionFilter({
       detailedErrors: false,
+
+      responseBodyFormatter: (_host, exception, errors) => ({
+        success: false,
+        message: Array.isArray(errors) ? String(errors[0] ?? 'VALIDATION_ERROR') : String(errors),
+        statusCode: exception.getStatus(),
+      }),
     }),
   );
-
   app.use(
     '/docs',
     basicAuth({
@@ -52,7 +61,7 @@ async function bootstrap() {
       scheme: 'bearer',
       bearerFormat: 'JWT',
     })
-    // .addGlobalParameters(...globalHeaderParametrs)
+    .addGlobalParameters(...globalHeaderParametrs)
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
