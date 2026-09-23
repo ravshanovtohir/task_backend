@@ -15,7 +15,7 @@ export class RoleService {
     private readonly rolesRepository: RolesRepository,
   ) {}
   async create(data: CreateRoleDto) {
-    const roleExists = await this.rolesRepository.getRoleByKey(data.key)
+    const roleExists = await this.rolesRepository.getRoleByKey(data.key);
 
     if (roleExists) {
       throw new ConflictException('Role with this key already exists!');

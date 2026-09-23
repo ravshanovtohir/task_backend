@@ -1,5 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, Length, Matches } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { ArrayUnique, IsArray, IsEmail, IsInt, IsOptional, IsString, Length, Matches } from 'class-validator';
 
 export class UpdateStaffDto {
   @ApiProperty({ type: String, required: true, minLength: 2, maxLength: 50, example: 'Madina' })
@@ -24,4 +25,15 @@ export class UpdateStaffDto {
   @IsString()
   @Matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])\S{1,8}$/)
   password: string;
+
+  @ApiPropertyOptional({
+    type: [Number],
+    example: [2, 3],
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @Type(() => Number)
+  @IsInt({ each: true })
+  roleIds?: number[];
 }

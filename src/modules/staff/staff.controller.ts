@@ -1,31 +1,56 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Req } from '@nestjs/common';
 import { StaffService } from './staff.service';
-import { CreateStaffDto, UpdateStaffDto } from './dto';
+import { CreateStaffDto, UpdateStaffDto, StaffListQueryDto } from './dto';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { RoleKey, Roles } from '@decorators';
+import { IRequest } from '@interfaces';
 
 @Controller('staff')
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
+  @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleKey.ADMIN)
   @Post()
-  create(@Body() data: CreateStaffDto) {
-    return this.staffService.create(data);
+  create(@Body() data: CreateStaffDto, @Req() request: IRequest) {
+    return this.staffService.create(data, request.user.id);
   }
 
+  @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleKey.ADMIN)
   @Get()
-  findAll() {
-    return this.staffService.findAll();
+  findAll(@Query() query: StaffListQueryDto) {
+    return this.staffService.findAll(query);
   }
 
+  @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleKey.ADMIN)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.staffService.findOne(+id);
   }
 
+  @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleKey.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateStaffDto) {
-    return this.staffService.update(+id, data);
+  update(@Param('id') id: string, @Body() data: UpdateStaffDto, @Req() request: IRequest) {
+    return this.staffService.update(+id, data, request.user.id);
   }
 
+  @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), RolesGuard)
+  @Roles(RoleKey.ADMIN)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.staffService.remove(+id);

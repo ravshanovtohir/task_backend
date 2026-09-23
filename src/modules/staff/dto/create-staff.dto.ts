@@ -1,6 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { i18nValidationMessage } from 'nestjs-i18n';
-import { IsEmail, IsNotEmpty, IsString, Length, Matches } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsArray,
+  IsEmail,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateStaffDto {
   @ApiProperty({ type: String, required: true, minLength: 2, maxLength: 50, example: 'Madina' })
@@ -23,6 +34,22 @@ export class CreateStaffDto {
   @ApiProperty({ type: String, required: true, minLength: 8, maxLength: 30, example: 'nimadirda' })
   @IsNotEmpty()
   @IsString()
-  @Matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?])\S{1,8}$/)
+  @Matches(/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,30}$/)
   password: string;
+
+  @ApiProperty({
+    type: [Number],
+    example: [2, 3],
+    description: 'Staff uchun biriktiriladigan role IDlari',
+  })
+  @IsArray()
+  @ArrayNotEmpty({
+    message: 'Kamida bitta role biriktirilishi shart',
+  })
+  @ArrayUnique({
+    message: 'Bir xil role ikki marta yuborilmasligi kerak',
+  })
+  @Type(() => Number)
+  @IsInt({ each: true })
+  roleIds: number[];
 }
