@@ -1,16 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
+import { RoleKey, Roles } from '@decorators';
 import { PaymentService } from './payment.service';
+import { TransactionListQueryDto } from './dto';
+import { RolesGuard } from '@guards';
 
-@Controller('payment')
+@ApiTags('Payments')
+@ApiBearerAuth()
+@Controller('payments')
+@UseGuards(AuthGuard('jwt'), RolesGuard)
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
+
+  @ApiOperation({
+    summary: 'Transaction list',
+    description: 'Transaction list',
+  })
+  @Roles(RoleKey.ADMIN, RoleKey.PAYMENT)
   @Get()
-  findAll() {
-    return this.paymentService.findAll();
+  findAll(@Query() query: TransactionListQueryDto) {
+    return this.paymentService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paymentService.findOne(+id);
+  @ApiOperation({
+    summary: 'Tranzaksiyalar report',
+    description: 'Tranzaksiyalar report',
+  })
+  @Roles(RoleKey.ADMIN, RoleKey.REPORTS)
+  @Get('reports')
+  findReports() {
+    return this.paymentService.getReports();
   }
 }

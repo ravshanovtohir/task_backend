@@ -233,15 +233,13 @@ export class StaffRepository {
     });
   }
   async deleteStaffDto(id: number) {
-    return await this.prisma.staff.update(
-      {
-        where: {
-          id: id
-        },
-        data: {
-          deletedAt: new Date()
-        }
-      }
-    )
+    return await this.prisma.staff.update({
+      where: {
+        id: id,
+      },
+      data: {
+        deletedAt: new Date(),
+      },
+    });
   }
 }

@@ -92,11 +92,11 @@ export class StaffService {
   }
 
   async remove(id: number) {
-    const staff = await this.staffRepository.getStaffById(id)
-    if(!staff) {
-      throw new NotFoundException('')
+    const staff = await this.staffRepository.getStaffById(id);
+    if (!staff) {
+      throw new NotFoundException('');
     }
-    await this.staffRepository.deleteStaffDto(id)
-    return {}
+    await this.staffRepository.deleteStaffDto(id);
+    return {};
   }
 }

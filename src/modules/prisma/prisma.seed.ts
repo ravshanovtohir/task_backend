@@ -106,58 +106,32 @@ firstSeeder()
     await prisma.$disconnect();
   });
 
-
 async function seedTransactions() {
-  const transactionCount = await prisma.transaction.count();
+  const transactionCount = await prisma.transactions.count();
 
   if (transactionCount > 0) {
     console.log('Transactions already exist!');
     return;
   }
 
-  const statuses = [
-    'SUCCESS',
-    'PENDING',
-    'FAILED',
-    'REFUNDED',
-  ];
+  const statuses = ['SUCCESS', 'PENDING', 'FAILED', 'REFUNDED'];
 
-  const providers = [
-    'PAYME',
-    'CLICK',
-    'UZUM',
-    'HUMO',
-    'UZCARD',
-  ];
+  const providers = ['PAYME', 'CLICK', 'UZUM', 'HUMO', 'UZCARD'];
 
-  const descriptions = [
-    'Оплата заказа',
-    'Оплата услуги',
-    'Пополнение баланса',
-    'Оплата подписки',
-    'Возврат платежа',
-  ];
+  const descriptions = ['Оплата заказа', 'Оплата услуги', 'Пополнение баланса', 'Оплата подписки', 'Возврат платежа'];
 
   const transactions = [];
 
   for (let i = 1; i <= 100; i++) {
-    const status =
-      statuses[Math.floor(Math.random() * statuses.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
 
-    const provider =
-      providers[Math.floor(Math.random() * providers.length)];
+    const provider = providers[Math.floor(Math.random() * providers.length)];
 
-    const description =
-      descriptions[
-        Math.floor(Math.random() * descriptions.length)
-      ];
+    const description = descriptions[Math.floor(Math.random() * descriptions.length)];
 
-    const amount =
-      Math.floor(Math.random() * 5_000_000) + 10_000;
+    const amount = Math.floor(Math.random() * 5_000_000) + 10_000;
 
-    const cardLastFour = String(
-      Math.floor(Math.random() * 10_000),
-    ).padStart(4, '0');
+    const cardLastFour = String(Math.floor(Math.random() * 10_000)).padStart(4, '0');
 
     transactions.push({
       reference: `TXN-${String(i).padStart(5, '0')}`,
@@ -170,7 +144,7 @@ async function seedTransactions() {
     });
   }
 
-  await prisma.transaction.createMany({
+  await prisma.transactions.createMany({
     data: transactions,
     skipDuplicates: true,
   });
@@ -178,4 +152,4 @@ async function seedTransactions() {
   console.log('100 transactions successfully created!');
 }
 
-seedTransactions()
+seedTransactions();

@@ -6,6 +6,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { PrismaModule, AuthModule, RoleModule, StaffModule, RedisModule, PaymentModule } from '@modules';
 import { AcceptLanguageResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
+import { CronModule } from './modules/cron/cron.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -28,6 +29,7 @@ import { join } from 'path';
     PrismaModule,
     RedisModule,
     PaymentModule,
+    CronModule,
   ],
   controllers: [],
   providers: [

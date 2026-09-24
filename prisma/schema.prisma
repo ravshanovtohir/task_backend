@@ -82,7 +82,7 @@ model Session {
   @@map("staff_session")
 }
 
-model Transaction {
+model Transactions {
   id             Int               @id @default(autoincrement())
   reference      String            @unique @db.VarChar(32)
   payerEmail     String            @map("payer_email") @db.VarChar(150)

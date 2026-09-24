@@ -21,7 +21,5 @@ export const HeadersValidation = createParamDecorator(async (_data: unknown, ctx
     throw new BadRequestException(messages);
   }
 
-  console.log(headersDto);
-
   return headersDto.lang ?? 'uz';
 });
