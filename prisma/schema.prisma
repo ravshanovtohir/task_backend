@@ -11,6 +11,13 @@ datasource db {
   provider = "postgresql"
 }
 
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
 model Staff {
   id        Int    @id @default(autoincrement())
   firstName String @map("first_name")
@@ -24,7 +31,7 @@ model Staff {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(5)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(5)
-  deletedAt DateTime? @updatedAt @map("deleted_at") @db.Timestamptz(5)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(5)
 
   @@map("staff")
 }
@@ -73,4 +80,21 @@ model Session {
 
   @@index([staffId, isActive])
   @@map("staff_session")
+}
+
+model Transaction {
+  id             Int               @id @default(autoincrement())
+  reference      String            @unique @db.VarChar(32)
+  payerEmail     String            @map("payer_email") @db.VarChar(150)
+  amount         Decimal           @db.Decimal(14, 2)
+  status         TransactionStatus
+  provider       String            @db.VarChar(30)
+  cardLastFour   String            @map("card_last_four") @db.Char(4)
+  description    String?
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([status])
+  @@index([payerEmail])
+  @@index([provider])
+  @@map("transactions")
 }

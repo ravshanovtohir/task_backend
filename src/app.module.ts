@@ -3,7 +3,7 @@ import { ResponseInterceptor } from '@interceptors';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { PrismaModule, AuthModule, RoleModule, StaffModule, RedisModule } from '@modules';
+import { PrismaModule, AuthModule, RoleModule, StaffModule, RedisModule, PaymentModule } from '@modules';
 import { AcceptLanguageResolver, I18nJsonLoader, I18nModule } from 'nestjs-i18n';
 import { join } from 'path';
 @Module({
@@ -27,6 +27,7 @@ import { join } from 'path';
     StaffModule,
     PrismaModule,
     RedisModule,
+    PaymentModule,
   ],
   controllers: [],
   providers: [

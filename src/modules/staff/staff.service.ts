@@ -91,7 +91,12 @@ export class StaffService {
     return {};
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} staff`;
+  async remove(id: number) {
+    const staff = await this.staffRepository.getStaffById(id)
+    if(!staff) {
+      throw new NotFoundException('')
+    }
+    await this.staffRepository.deleteStaffDto(id)
+    return {}
   }
 }
