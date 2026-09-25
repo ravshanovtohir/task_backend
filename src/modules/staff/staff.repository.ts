@@ -11,7 +11,7 @@ export class StaffRepository {
   async getStaffByEmail(email: string) {
     return this.prisma.staff.findUnique({
       where: {
-        email: email,
+        email,
       },
     });
   }
@@ -35,7 +35,9 @@ export class StaffRepository {
 
     const where: Prisma.StaffWhereInput = {
       ...(id !== undefined ? { id } : {}),
-
+      deletedAt: {
+        equals: null,
+      },
       ...(email
         ? {
             email: {
@@ -145,6 +147,7 @@ export class StaffRepository {
       ON assigned_by.id = sr.assigned_by
 
     WHERE s.id = ${id}
+      AND s.deleted_at IS NULL
 
     GROUP BY
       s.id,
@@ -184,9 +187,10 @@ export class StaffRepository {
   }
 
   async getStaffForUpdate(id: number) {
-    return this.prisma.staff.findUnique({
+    return this.prisma.staff.findFirst({
       where: {
         id,
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -212,17 +216,25 @@ export class StaffRepository {
         },
       });
 
-      // roleIds yuborilmagan bo‘lsa, eski role’lar saqlanadi
+      // O'zgarmagan rollarning assignedBy va assignedAt qiymatlarini saqlaymiz.
       if (roleIds !== undefined) {
         await tx.staffRole.deleteMany({
           where: {
             staffId: id,
+            roleId: { notIn: roleIds },
           },
         });
 
-        if (roleIds.length > 0) {
+        const currentRoles = await tx.staffRole.findMany({
+          where: { staffId: id },
+          select: { roleId: true },
+        });
+        const currentRoleIds = new Set(currentRoles.map((role) => role.roleId));
+        const newRoleIds = roleIds.filter((roleId) => !currentRoleIds.has(roleId));
+
+        if (newRoleIds.length > 0) {
           await tx.staffRole.createMany({
-            data: roleIds.map((roleId) => ({
+            data: newRoleIds.map((roleId) => ({
               staffId: id,
               roleId,
               assignedBy,
@@ -233,13 +245,16 @@ export class StaffRepository {
     });
   }
   async deleteStaffDto(id: number) {
-    return await this.prisma.staff.update({
-      where: {
-        id: id,
-      },
-      data: {
-        deletedAt: new Date(),
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await tx.staff.update({
+        where: { id },
+        data: { deletedAt: new Date() },
+      });
+
+      await tx.session.updateMany({
+        where: { staffId: id, isActive: true },
+        data: { isActive: false },
+      });
     });
   }
 }

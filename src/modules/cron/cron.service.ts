@@ -4,9 +4,9 @@ import { PrismaService } from '@prisma';
 
 @Injectable()
 export class CronService {
-  constructor(
-    private readonly prisma: PrismaService,
-  ) {}
+  private readonly logger = new Logger(CronService.name);
+
+  constructor(private readonly prisma: PrismaService) {}
 
   @Cron('0 0 3 * * *', {
     name: 'expired-session-cleanup',
@@ -21,5 +21,6 @@ export class CronService {
         },
       },
     });
+    this.logger.log(`Expired sessions removed: ${result.count}`);
   }
 }

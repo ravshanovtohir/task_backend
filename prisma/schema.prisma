@@ -46,7 +46,7 @@ model Role {
 
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(5)
   updatedAt DateTime? @updatedAt @map("updated_at") @db.Timestamptz(5)
-  deletedAt DateTime? @updatedAt @map("deleted_at") @db.Timestamptz(5)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(5)
 
   @@map("role")
 }
@@ -82,7 +82,7 @@ model Session {
   @@map("staff_session")
 }
 
-model Transactions {
+model Transaction {
   id             Int               @id @default(autoincrement())
   reference      String            @unique @db.VarChar(32)
   payerEmail     String            @map("payer_email") @db.VarChar(150)

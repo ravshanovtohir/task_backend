@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { PrismaModule } from '@prisma';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JWT_ACCESS_EXPIRE_TIME, JWT_ACCESS_SECRET } from '@config';
+import { JWT_ACCESS_EXPIRE_TIME } from '@config';
 import { AuthRepository } from './auth.repository';
 import { RedisModule } from '@redis';
 import { PassportModule } from '@nestjs/passport';
@@ -15,7 +15,7 @@ import { JwtStrategy } from '../../common/strategy/jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: JWT_ACCESS_SECRET,
+        secret: configService.get<string>('JWT_ACCESS_SECRET'),
         signOptions: { expiresIn: JWT_ACCESS_EXPIRE_TIME },
       }),
       inject: [ConfigService],

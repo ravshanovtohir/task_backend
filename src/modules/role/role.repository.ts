@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@prisma';
-import { Prisma, Session } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { CreateRoleDto, RoleListQueryDto, UpdateRoleDto } from './dto';
 import { paginate } from '@helpers';
 
@@ -8,7 +8,7 @@ import { paginate } from '@helpers';
 export class RolesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getRoles(query: RoleListQueryDto, lang: string) {
+  async getRoles(query: RoleListQueryDto) {
     const { page, perPage, search, key } = query;
 
     const where: Prisma.RoleWhereInput = {
@@ -99,7 +99,6 @@ export class RolesRepository {
         title: {
           uz: data.title.uz,
           ru: data.title.ru,
-          en: data.title.en,
         },
         key: data.key,
       },
@@ -115,7 +114,6 @@ export class RolesRepository {
         title: {
           uz: data.title.uz,
           ru: data.title.ru,
-          en: data.title.en,
         },
       },
       select: {

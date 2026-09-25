@@ -1,15 +1,15 @@
 import { IsEnum, IsOptional } from 'class-validator';
 import type { ParameterObject } from '@nestjs/swagger';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 enum Lang {
   uz = 'uz',
   ru = 'ru',
-  en = 'en',
 }
 
 export class DeviceHeadersDto {
   @IsOptional()
-  @IsEnum(Lang)
+  @IsEnum(Lang, { message: i18nValidationMessage('main.validation.language.invalid') })
   lang?: Lang;
 }
 
@@ -21,7 +21,7 @@ export const globalHeaderParametrs: ParameterObject[] = [
     schema: {
       enum: ['uz', 'ru'],
       type: 'string',
-      default: 'ru',
+      default: 'uz',
     },
   },
 ];

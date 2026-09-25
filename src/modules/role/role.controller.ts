@@ -5,6 +5,7 @@ import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { HeadersValidation, RoleKey, Roles } from '@decorators';
 import { RolesGuard } from '../../common/guards/roles.guard';
+import { ParseIdPipe } from '@pipes';
 
 @Controller('role')
 export class RoleController {
@@ -33,23 +34,23 @@ export class RoleController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(RoleKey.ADMIN)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.roleService.findOne(+id);
+  findOne(@Param('id', ParseIdPipe) id: number, @HeadersValidation() lang: string) {
+    return this.roleService.findOne(id, lang);
   }
 
   @Patch(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(RoleKey.ADMIN)
-  update(@Param('id') id: string, @Body() updateRoleDto: UpdateRoleDto) {
-    return this.roleService.update(+id, updateRoleDto);
+  update(@Param('id', ParseIdPipe) id: number, @Body() updateRoleDto: UpdateRoleDto) {
+    return this.roleService.update(id, updateRoleDto);
   }
 
   @Delete(':id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(RoleKey.ADMIN)
-  remove(@Param('id') id: string) {
-    return this.roleService.remove(+id);
+  remove(@Param('id', ParseIdPipe) id: number) {
+    return this.roleService.remove(id);
   }
 }

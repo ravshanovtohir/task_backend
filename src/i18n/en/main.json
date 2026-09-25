@@ -1,6 +1,0 @@
-{
-  "NOT_EMPTY": "{property} kiritilishi majburiy",
-  "INVALID_EMAIL": "Email manzili noto‘g‘ri",
-  "MIN_LENGTH": "{property} kamida {constraints.0} ta belgidan iborat bo‘lishi kerak",
-  "MAX_LENGTH": "{property} ko‘pi bilan {constraints.0} ta belgi bo‘lishi mumkin"
-}

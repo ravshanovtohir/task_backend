@@ -1,5 +1,5 @@
 import { validate } from '@config';
-import { ResponseInterceptor } from '@interceptors';
+import { RequestLoggingInterceptor, ResponseInterceptor } from '@interceptors';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
@@ -36,6 +36,10 @@ import { CronModule } from './modules/cron/cron.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestLoggingInterceptor,
     },
   ],
   exports: [],

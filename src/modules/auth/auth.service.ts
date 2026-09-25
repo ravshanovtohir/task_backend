@@ -1,17 +1,15 @@
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '@prisma';
 import { JwtService } from '@nestjs/jwt';
-import { CreateAuthDto, LoginRequestDto } from './dto';
+import { LoginRequestDto } from './dto';
 import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { JWT_ACCESS_SECRET, JWT_REFRESH_EXPIRE_TIME, JWT_REFRESH_SECRET } from '@config';
+import { JWT_ACCESS_SECRET, JWT_REFRESH_EXPIRE_TIME } from '@config';
 import { AuthRepository } from './auth.repository';
 import * as crypto from 'crypto';
 import { RedisService } from '@redis';
 
 @Injectable()
 export class AuthService {
-  private readonly REFRESH_EXPIRES_IN_DAYS = 10;
-  private readonly REFRESH_EXPIRES_IN_SECONDS = 10 * 24 * 60 * 60;
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
@@ -23,6 +21,7 @@ export class AuthService {
     const staff = await this.prisma.staff.findUnique({
       where: {
         email: email,
+        deletedAt: null,
       },
       select: {
         id: true,
@@ -34,14 +33,14 @@ export class AuthService {
     });
 
     if (!staff) {
-      throw new NotFoundException('Пользователь не существует!');
+      throw new UnauthorizedException('main.error.auth.invalidCredentials');
     }
 
     return {
       id: staff.id,
       firstName: staff.firstName,
       lastName: staff.lastName,
-      emai: staff.email,
+      email: staff.email,
       password: staff.password,
     };
   }
@@ -49,22 +48,17 @@ export class AuthService {
   async login(data: LoginRequestDto, meta: { ip: string; userAgent: string }) {
     const staff = await this.validate(data.login);
 
-    if (!staff) {
-      throw new NotFoundException('User with this login not found!');
-    }
-
     const isMatch = await bcrypt.compare(data.password, staff.password);
 
     if (!isMatch) {
-      throw new UnauthorizedException('Недействительные учетные данные!');
+      throw new UnauthorizedException('main.error.auth.invalidCredentials');
     }
 
     await this.authRepository.deActivateAllSessions(staff.id);
 
     const newRefreshToken = crypto.randomBytes(64).toString('hex');
     const refreshTokenHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + this.REFRESH_EXPIRES_IN_DAYS);
+    const expiresAt = new Date(Date.now() + JWT_REFRESH_EXPIRE_TIME * 1000);
 
     const session = await this.authRepository.creaetNewSession({
       staffId: staff.id,
@@ -75,11 +69,7 @@ export class AuthService {
       expiresAt,
     });
 
-    await this.redisService.set(
-      `admin:active_session:${staff.id}`,
-      session.id.toString(),
-      this.REFRESH_EXPIRES_IN_SECONDS,
-    );
+    await this.redisService.set(`admin:active_session:${staff.id}`, session.id.toString(), JWT_REFRESH_EXPIRE_TIME);
 
     const accessToken = this.accessTokenGenerator(staff.id, session.id);
 
@@ -91,6 +81,11 @@ export class AuthService {
 
   async getMe(staffId: number) {
     const staff = await this.authRepository.getStaffById(staffId);
+
+    if (!staff) {
+      throw new NotFoundException('main.error.auth.userNotFound');
+    }
+
     return {
       id: staff.id,
       first_name: staff.firstName,
@@ -120,13 +115,13 @@ export class AuthService {
     const session = await this.authRepository.findByTokenHash(refreshTokenHash);
 
     if (!session || !session.isActive || session.expiresAt.getTime() <= Date.now()) {
-      throw new UnauthorizedException('Сессия недействительна или срок её действия истёк.');
+      throw new UnauthorizedException('main.error.auth.sessionInvalid');
     }
 
     const activeSessionId = await this.redisService.get(`admin:active_session:${session.staffId}`);
 
     if (activeSessionId !== session.id) {
-      throw new UnauthorizedException('Сессия была завершена после входа с другого устройства.');
+      throw new UnauthorizedException('main.error.auth.sessionRevoked');
     }
 
     const newRefreshToken = crypto.randomBytes(64).toString('hex');
@@ -152,7 +147,7 @@ export class AuthService {
     const session = await this.authRepository.findSessionById(sessionId);
 
     if (!session || session.staffId !== staffId || !session.isActive) {
-      throw new UnauthorizedException('Сессия не найдена или уже завершена.');
+      throw new UnauthorizedException('main.error.auth.logoutSessionNotFound');
     }
 
     await this.authRepository.deactivateSession(session.id);
@@ -164,8 +159,6 @@ export class AuthService {
       await this.redisService.delete(redisKey);
     }
 
-    return {
-      message: 'Вы успешно вышли из системы.',
-    };
+    return {};
   }
 }

@@ -2,7 +2,7 @@ import 'dotenv/config';
 
 import * as bcrypt from 'bcrypt';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, TransactionStatus } from '@prisma/client';
 
 const databaseUrl = process.env.DATABASE_URL;
 const adminEmail = process.env.ADMIN_EMAIL;
@@ -10,6 +10,10 @@ const adminPassword = process.env.ADMIN_PASSWORD;
 
 if (!databaseUrl) {
   throw new Error('Переменная DATABASE_URL не найдена.');
+}
+
+if (!adminEmail || !adminPassword) {
+  throw new Error('Переменные ADMIN_EMAIL и ADMIN_PASSWORD обязательны.');
 }
 
 const adapter = new PrismaPg({
@@ -96,25 +100,15 @@ async function firstSeeder() {
   console.log('Системные роли успешно проверены и созданы.');
 }
 
-firstSeeder()
-  .catch((error: unknown) => {
-    console.error('Ошибка при выполнении начального заполнения базы данных:');
-    console.error(error);
-    process.exitCode = 1;
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
-
 async function seedTransactions() {
-  const transactionCount = await prisma.transactions.count();
+  const transactionCount = await prisma.transaction.count();
 
   if (transactionCount > 0) {
     console.log('Transactions already exist!');
     return;
   }
 
-  const statuses = ['SUCCESS', 'PENDING', 'FAILED', 'REFUNDED'];
+  const statuses: TransactionStatus[] = ['SUCCESS', 'PENDING', 'FAILED', 'REFUNDED'];
 
   const providers = ['PAYME', 'CLICK', 'UZUM', 'HUMO', 'UZCARD'];
 
@@ -144,7 +138,7 @@ async function seedTransactions() {
     });
   }
 
-  await prisma.transactions.createMany({
+  await prisma.transaction.createMany({
     data: transactions,
     skipDuplicates: true,
   });
@@ -152,4 +146,17 @@ async function seedTransactions() {
   console.log('100 transactions successfully created!');
 }
 
-seedTransactions();
+async function runSeed() {
+  await firstSeeder();
+  await seedTransactions();
+}
+
+runSeed()
+  .catch((error: unknown) => {
+    console.error('Ошибка при выполнении начального заполнения базы данных:');
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

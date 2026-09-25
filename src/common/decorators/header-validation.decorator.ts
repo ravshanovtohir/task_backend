@@ -16,9 +16,7 @@ export const HeadersValidation = createParamDecorator(async (_data: unknown, ctx
   const errors = await validate(headersDto);
 
   if (errors.length > 0) {
-    const messages = errors.flatMap((error) => Object.values(error.constraints ?? {}));
-
-    throw new BadRequestException(messages);
+    throw new BadRequestException('main.validation.language.invalid');
   }
 
   return headersDto.lang ?? 'uz';

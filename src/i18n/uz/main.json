@@ -1,6 +1,100 @@
 {
-  "NOT_EMPTY": "{property} kiritilishi majburiy",
-  "INVALID_EMAIL": "Email manzili noto‘g‘ri",
-  "MIN_LENGTH": "{property} kamida {constraints.0} ta belgidan iborat bo‘lishi kerak",
-  "MAX_LENGTH": "{property} ko‘pi bilan {constraints.0} ta belgi bo‘lishi mumkin"
+  "error": {
+    "common": {
+      "badRequest": "So‘rov noto‘g‘ri.",
+      "unauthorized": "Tizimga kirish talab qilinadi.",
+      "forbidden": "Bu amal uchun ruxsatingiz yo‘q.",
+      "notFound": "Ma’lumot topilmadi.",
+      "conflict": "Bu ma’lumot allaqachon mavjud.",
+      "internalServer": "Serverda xatolik yuz berdi.",
+      "duplicate": "Bu qiymat allaqachon mavjud.",
+      "foreignKey": "Bog‘liq ma’lumot sababli amal bajarilmadi."
+    },
+    "auth": {
+      "userNotFound": "Foydalanuvchi topilmadi.",
+      "invalidCredentials": "Login yoki parol noto‘g‘ri.",
+      "tokenExpired": "Token muddati tugagan.",
+      "sessionInvalid": "Sessiya yaroqsiz yoki muddati tugagan.",
+      "sessionRevoked": "Sessiya bekor qilingan.",
+      "logoutSessionNotFound": "Sessiya topilmadi yoki yakunlangan."
+    },
+    "staff": {
+      "notFound": "Xodim topilmadi.",
+      "emailExists": "Bu email allaqachon ro‘yxatdan o‘tgan.",
+      "roleNotFound": "Ko‘rsatilgan rollardan biri topilmadi.",
+      "adminRoleForbidden": "ADMIN rolini bu amal orqali biriktirib bo‘lmaydi."
+    },
+    "role": {
+      "notFound": "Rol topilmadi.",
+      "keyExists": "Bu kalitli rol allaqachon mavjud."
+    }
+  },
+  "validation": {
+    "common": {
+      "invalidId": "ID musbat butun son bo‘lishi kerak.",
+      "unknownField": "So‘rovda ruxsat etilmagan maydon bor."
+    },
+    "auth": {
+      "loginRequired": "Login kiritilishi shart.",
+      "loginString": "Login matn bo‘lishi kerak.",
+      "passwordRequired": "Parol kiritilishi shart.",
+      "passwordString": "Parol matn bo‘lishi kerak.",
+      "refreshTokenRequired": "Refresh token kiritilishi shart.",
+      "refreshTokenString": "Refresh token matn bo‘lishi kerak."
+    },
+    "staff": {
+      "firstNameRequired": "Ism kiritilishi shart.",
+      "firstNameString": "Ism matn bo‘lishi kerak.",
+      "firstNameLength": "Ism 2 dan 50 tagacha belgidan iborat bo‘lishi kerak.",
+      "firstNameLetters": "Ism faqat harflardan iborat bo‘lishi kerak.",
+      "lastNameRequired": "Familiya kiritilishi shart.",
+      "lastNameString": "Familiya matn bo‘lishi kerak.",
+      "lastNameLength": "Familiya 2 dan 50 tagacha belgidan iborat bo‘lishi kerak.",
+      "lastNameLetters": "Familiya faqat harflardan iborat bo‘lishi kerak.",
+      "emailRequired": "Email kiritilishi shart.",
+      "emailInvalid": "Email manzili noto‘g‘ri.",
+      "passwordRequired": "Parol kiritilishi shart.",
+      "passwordString": "Parol matn bo‘lishi kerak.",
+      "passwordPattern": "Parol 8–30 belgi, bosh harf va maxsus belgi bo‘lishi kerak.",
+      "rolesArray": "Rollar ro‘yxat shaklida yuborilishi kerak.",
+      "rolesRequired": "Kamida bitta rol biriktirilishi shart.",
+      "rolesUnique": "Bir xil rolni ikki marta yuborib bo‘lmaydi.",
+      "roleIdInteger": "Rol IDlari butun son bo‘lishi kerak.",
+      "searchString": "Qidiruv matn bo‘lishi kerak."
+    },
+    "role": {
+      "keyRequired": "Rol kaliti kiritilishi shart.",
+      "keyString": "Rol kaliti matn bo‘lishi kerak.",
+      "titleRequired": "Rol nomi kiritilishi shart.",
+      "titleUzRequired": "O‘zbekcha nom kiritilishi shart.",
+      "titleUzString": "O‘zbekcha nom matn bo‘lishi kerak.",
+      "titleUzLength": "O‘zbekcha nom 2 dan 50 tagacha belgidan iborat bo‘lishi kerak.",
+      "titleRuRequired": "Ruscha nom kiritilishi shart.",
+      "titleRuString": "Ruscha nom matn bo‘lishi kerak.",
+      "titleRuLength": "Ruscha nom 2 dan 50 tagacha belgidan iborat bo‘lishi kerak."
+    },
+    "pagination": {
+      "pageInteger": "Sahifa raqami butun son bo‘lishi kerak.",
+      "pageMinimum": "Sahifa raqami kamida 1 bo‘lishi kerak.",
+      "perPageInteger": "Sahifa hajmi butun son bo‘lishi kerak.",
+      "perPageMinimum": "Sahifa hajmi kamida 1 bo‘lishi kerak.",
+      "perPageMaximum": "Sahifa hajmi 100 dan oshmasligi kerak."
+    },
+    "payment": {
+      "referenceString": "Qidiruv qiymati matn bo‘lishi kerak.",
+      "statusInvalid": "Tranzaksiya holati noto‘g‘ri.",
+      "dateInvalid": "Sana formati noto‘g‘ri.",
+      "amountNumber": "Summa son bo‘lishi kerak.",
+      "amountMinimum": "Summa 0 dan kichik bo‘lmasligi kerak."
+    },
+    "language": {
+      "invalid": "Accept-Language faqat uz yoki ru bo‘lishi mumkin."
+    }
+  },
+  "transactionStatus": {
+    "PENDING": "Kutilmoqda",
+    "SUCCESS": "Muvaffaqiyatli",
+    "FAILED": "Muvaffaqiyatsiz",
+    "REFUNDED": "Qaytarilgan"
+  }
 }

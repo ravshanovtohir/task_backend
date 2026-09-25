@@ -56,6 +56,7 @@ export class AuthRepository {
     return this.prisma.session.findFirst({
       where: {
         refreshTokenHash: hash,
+        staff: { deletedAt: null },
       },
     });
   }
@@ -81,6 +82,7 @@ export class AuthRepository {
     return this.prisma.staff.findUnique({
       where: {
         id: staffId,
+        deletedAt: null,
       },
       select: {
         id: true,

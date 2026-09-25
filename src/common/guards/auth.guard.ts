@@ -20,10 +20,10 @@ export class AtGuard extends AuthGuard('jwt') {
   handleRequest(err, user, info) {
     if (err || !user) {
       if (info instanceof TokenExpiredError) {
-        throw new UnauthorizedException();
+        throw new UnauthorizedException('main.error.auth.tokenExpired');
       }
 
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('main.error.common.unauthorized');
     }
 
     return user;

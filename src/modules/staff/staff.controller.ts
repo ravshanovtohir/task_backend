@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { RoleKey, Roles } from '@decorators';
 import { IRequest } from '@interfaces';
+import { ParseIdPipe } from '@pipes';
 
 @Controller('staff')
 export class StaffController {
@@ -34,8 +35,8 @@ export class StaffController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(RoleKey.ADMIN)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.staffService.findOne(+id);
+  findOne(@Param('id', ParseIdPipe) id: number) {
+    return this.staffService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
@@ -43,8 +44,8 @@ export class StaffController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(RoleKey.ADMIN)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() data: UpdateStaffDto, @Req() request: IRequest) {
-    return this.staffService.update(+id, data, request.user.id);
+  update(@Param('id', ParseIdPipe) id: number, @Body() data: UpdateStaffDto, @Req() request: IRequest) {
+    return this.staffService.update(id, data, request.user.id);
   }
 
   @ApiOperation({ summary: 'Create new role', description: 'Create new Role' })
@@ -52,7 +53,7 @@ export class StaffController {
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles(RoleKey.ADMIN)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.staffService.remove(+id);
+  remove(@Param('id', ParseIdPipe) id: number) {
+    return this.staffService.remove(id);
   }
 }

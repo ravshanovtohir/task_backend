@@ -2,38 +2,32 @@ import { RoleKey } from '@decorators';
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsNotEmpty, IsString, MaxLength, MinLength, ValidateNested } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class LocalizedTitleDto {
   @ApiProperty({ type: String, required: true, example: 'Admin' })
-  @IsString({ message: "O'zbekcha nom string bo'lishi kerak" })
-  @IsNotEmpty({ message: "O'zbekcha nom kiritilishi shart" })
-  @MinLength(2, { message: "O'zbekcha nom kamida 2 ta belgidan iborat bo'lishi kerak" })
-  @MaxLength(50, { message: "O'zbekcha nom ko'pi bilan 50 ta belgidan oshmasligi kerak" })
+  @IsString({ message: i18nValidationMessage('main.validation.role.titleUzString') })
+  @IsNotEmpty({ message: i18nValidationMessage('main.validation.role.titleUzRequired') })
+  @MinLength(2, { message: i18nValidationMessage('main.validation.role.titleUzLength') })
+  @MaxLength(50, { message: i18nValidationMessage('main.validation.role.titleUzLength') })
   uz: string;
 
   @ApiProperty({ type: String, required: true, example: 'Админ' })
-  @IsString({ message: "Ruscha nom string bo'lishi kerak" })
-  @IsNotEmpty({ message: 'Ruscha nom kiritilishi shart' })
-  @MinLength(2, { message: "Ruscha nom kamida 2 ta belgidan iborat bo'lishi kerak" })
-  @MaxLength(50, { message: "Ruscha nom ko'pi bilan 50 ta belgidan oshmasligi kerak" })
+  @IsString({ message: i18nValidationMessage('main.validation.role.titleRuString') })
+  @IsNotEmpty({ message: i18nValidationMessage('main.validation.role.titleRuRequired') })
+  @MinLength(2, { message: i18nValidationMessage('main.validation.role.titleRuLength') })
+  @MaxLength(50, { message: i18nValidationMessage('main.validation.role.titleRuLength') })
   ru: string;
-
-  @ApiProperty({ type: String, required: true, example: 'Admin' })
-  @IsString({ message: "Inglizcha nom string bo'lishi kerak" })
-  @IsNotEmpty({ message: 'Inglizcha nom kiritilishi shart' })
-  @MinLength(2, { message: "Inglizcha nom kamida 2 ta belgidan iborat bo'lishi kerak" })
-  @MaxLength(50, { message: "Inglizcha nom ko'pi bilan 50 ta belgidan oshmasligi kerak" })
-  en: string;
 }
 
 export class CreateRoleDto {
   @ApiProperty({ type: String, required: true, enum: RoleKey })
-  @IsString()
-  @IsNotEmpty({ message: 'Rol kaliti (key) kiritilishi shart' })
+  @IsString({ message: i18nValidationMessage('main.validation.role.keyString') })
+  @IsNotEmpty({ message: i18nValidationMessage('main.validation.role.keyRequired') })
   key: string;
 
   @ApiProperty({ type: LocalizedTitleDto, required: true, example: LocalizedTitleDto })
-  @IsNotEmpty({ message: 'Rol nomlari kiritilishi shart' })
+  @IsNotEmpty({ message: i18nValidationMessage('main.validation.role.titleRequired') })
   @ValidateNested()
   @Type(() => LocalizedTitleDto)
   title: LocalizedTitleDto;

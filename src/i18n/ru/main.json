@@ -1,6 +1,100 @@
 {
-  "NOT_EMPTY": "{property} kiritilishi majburiy",
-  "INVALID_EMAIL": "Email manzili noto‘g‘ri",
-  "MIN_LENGTH": "{property} kamida {constraints.0} ta belgidan iborat bo‘lishi kerak",
-  "MAX_LENGTH": "{property} ko‘pi bilan {constraints.0} ta belgi bo‘lishi mumkin"
+  "error": {
+    "common": {
+      "badRequest": "Некорректный запрос.",
+      "unauthorized": "Необходимо войти в систему.",
+      "forbidden": "Недостаточно прав для этого действия.",
+      "notFound": "Данные не найдены.",
+      "conflict": "Такие данные уже существуют.",
+      "internalServer": "Внутренняя ошибка сервера.",
+      "duplicate": "Это значение уже существует.",
+      "foreignKey": "Операция невозможна из-за связанных данных."
+    },
+    "auth": {
+      "userNotFound": "Пользователь не найден.",
+      "invalidCredentials": "Неверный логин или пароль.",
+      "tokenExpired": "Срок действия токена истёк.",
+      "sessionInvalid": "Сессия недействительна или срок её действия истёк.",
+      "sessionRevoked": "Сессия отозвана.",
+      "logoutSessionNotFound": "Сессия не найдена или уже завершена."
+    },
+    "staff": {
+      "notFound": "Сотрудник не найден.",
+      "emailExists": "Этот email уже зарегистрирован.",
+      "roleNotFound": "Одна из указанных ролей не найдена.",
+      "adminRoleForbidden": "Роль ADMIN нельзя назначить этим действием."
+    },
+    "role": {
+      "notFound": "Роль не найдена.",
+      "keyExists": "Роль с таким ключом уже существует."
+    }
+  },
+  "validation": {
+    "common": {
+      "invalidId": "ID должен быть положительным целым числом.",
+      "unknownField": "Запрос содержит недопустимое поле."
+    },
+    "auth": {
+      "loginRequired": "Укажите логин.",
+      "loginString": "Логин должен быть строкой.",
+      "passwordRequired": "Укажите пароль.",
+      "passwordString": "Пароль должен быть строкой.",
+      "refreshTokenRequired": "Укажите refresh token.",
+      "refreshTokenString": "Refresh token должен быть строкой."
+    },
+    "staff": {
+      "firstNameRequired": "Укажите имя.",
+      "firstNameString": "Имя должно быть строкой.",
+      "firstNameLength": "Имя должно содержать от 2 до 50 символов.",
+      "firstNameLetters": "Имя должно содержать только буквы.",
+      "lastNameRequired": "Укажите фамилию.",
+      "lastNameString": "Фамилия должна быть строкой.",
+      "lastNameLength": "Фамилия должна содержать от 2 до 50 символов.",
+      "lastNameLetters": "Фамилия должна содержать только буквы.",
+      "emailRequired": "Укажите email.",
+      "emailInvalid": "Некорректный адрес электронной почты.",
+      "passwordRequired": "Укажите пароль.",
+      "passwordString": "Пароль должен быть строкой.",
+      "passwordPattern": "Пароль должен содержать 8–30 символов, заглавную букву и специальный символ.",
+      "rolesArray": "Роли должны быть массивом.",
+      "rolesRequired": "Назначьте хотя бы одну роль.",
+      "rolesUnique": "Нельзя указать одну и ту же роль дважды.",
+      "roleIdInteger": "ID ролей должны быть целыми числами.",
+      "searchString": "Поисковый запрос должен быть строкой."
+    },
+    "role": {
+      "keyRequired": "Укажите ключ роли.",
+      "keyString": "Ключ роли должен быть строкой.",
+      "titleRequired": "Укажите название роли.",
+      "titleUzRequired": "Укажите название на узбекском языке.",
+      "titleUzString": "Узбекское название должно быть строкой.",
+      "titleUzLength": "Узбекское название должно содержать от 2 до 50 символов.",
+      "titleRuRequired": "Укажите название на русском языке.",
+      "titleRuString": "Русское название должно быть строкой.",
+      "titleRuLength": "Русское название должно содержать от 2 до 50 символов."
+    },
+    "pagination": {
+      "pageInteger": "Номер страницы должен быть целым числом.",
+      "pageMinimum": "Номер страницы должен быть не меньше 1.",
+      "perPageInteger": "Размер страницы должен быть целым числом.",
+      "perPageMinimum": "Размер страницы должен быть не меньше 1.",
+      "perPageMaximum": "Размер страницы не должен превышать 100."
+    },
+    "payment": {
+      "referenceString": "Поисковое значение должно быть строкой.",
+      "statusInvalid": "Недопустимый статус транзакции.",
+      "dateInvalid": "Некорректный формат даты.",
+      "amountNumber": "Сумма должна быть числом.",
+      "amountMinimum": "Сумма не может быть меньше 0."
+    },
+    "language": {
+      "invalid": "Accept-Language может быть только uz или ru."
+    }
+  },
+  "transactionStatus": {
+    "PENDING": "Ожидается",
+    "SUCCESS": "Успешно",
+    "FAILED": "Неуспешно",
+    "REFUNDED": "Возвращено"
+  }
 }

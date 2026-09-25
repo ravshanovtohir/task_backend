@@ -21,7 +21,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: IUser) {
     const [staff, activeSessionId] = await Promise.all([
       this.prisma.staff.findUnique({
-        where: { id: payload.id },
+        where: { id: payload.id, deletedAt: null },
         select: {
           id: true,
           roles: {
@@ -39,11 +39,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     ]);
 
     if (!staff) {
-      throw new UnauthorizedException('Пользователь не найден.');
+      throw new UnauthorizedException('main.error.auth.userNotFound');
     }
 
     if (!activeSessionId || activeSessionId !== String(payload.sid)) {
-      throw new UnauthorizedException('Сессия недействительна или отозвана.');
+      throw new UnauthorizedException('main.error.auth.sessionRevoked');
     }
 
     return {

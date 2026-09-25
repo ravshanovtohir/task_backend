@@ -2,9 +2,9 @@ import { APP_PORT } from './config';
 import { AppModule } from './app.module';
 import { NestFactory } from '@nestjs/core';
 import * as basicAuth from 'express-basic-auth';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { VersioningType } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
+import { I18nContext, I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 import { AllExceptionsFilter } from '@exceptions';
 import { globalHeaderParametrs } from '@enums';
 
@@ -35,11 +35,21 @@ async function bootstrap() {
     new I18nValidationExceptionFilter({
       detailedErrors: false,
 
-      responseBodyFormatter: (_host, exception, errors) => ({
-        success: false,
-        message: Array.isArray(errors) ? String(errors[0] ?? 'VALIDATION_ERROR') : String(errors),
-        statusCode: exception.getStatus(),
-      }),
+      responseBodyFormatter: (host, exception, errors) => {
+        const firstError = Array.isArray(errors) ? String(errors[0] ?? '') : String(errors);
+        const i18n = I18nContext.current(host);
+        const message = firstError.includes('should not exist')
+          ? i18n
+            ? String(i18n.t('main.validation.common.unknownField' as never))
+            : 'main.validation.common.unknownField'
+          : firstError;
+
+        return {
+          success: false,
+          message,
+          statusCode: exception.getStatus(),
+        };
+      },
     }),
   );
   app.use(

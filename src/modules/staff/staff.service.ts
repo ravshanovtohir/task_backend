@@ -12,25 +12,29 @@ import * as bcrypt from 'bcrypt';
 import { BCRYPT_SALT } from '@constants';
 import { RoleKey } from '@decorators';
 import { StaffListQueryDto } from './dto';
+import { RedisService } from '@redis';
 @Injectable()
 export class StaffService {
-  constructor(private readonly staffRepository: StaffRepository) {}
+  constructor(
+    private readonly staffRepository: StaffRepository,
+    private readonly redisService: RedisService,
+  ) {}
   async create(data: CreateStaffDto, staffId: number) {
     const emailExists = await this.staffRepository.getStaffByEmail(data.email);
 
     if (emailExists) {
-      throw new ConflictException();
+      throw new ConflictException('main.error.staff.emailExists');
     }
 
     const roles = await this.staffRepository.findRolesByIds(data.roleIds);
     if (data.roleIds.length !== roles.length) {
-      throw new BadRequestException('ROle noe found');
+      throw new BadRequestException('main.error.staff.roleNotFound');
     }
 
     const hasAdminRole = roles.some((role) => role.key === RoleKey.ADMIN);
 
     if (hasAdminRole) {
-      throw new ForbiddenException('Yangi foydalanuvchiga ADMIN roli biriktirilmaydi');
+      throw new ForbiddenException('main.error.staff.adminRoleForbidden');
     }
 
     const hashedPassword = await bcrypt.hash(data.password, BCRYPT_SALT);
@@ -47,7 +51,7 @@ export class StaffService {
   async findOne(id: number) {
     const staff = await this.staffRepository.getStaffById(id);
     if (!staff) {
-      throw new NotFoundException();
+      throw new NotFoundException('main.error.staff.notFound');
     }
     return staff;
   }
@@ -56,14 +60,14 @@ export class StaffService {
     const staff = await this.staffRepository.getStaffForUpdate(id);
 
     if (!staff) {
-      throw new NotFoundException('');
+      throw new NotFoundException('main.error.staff.notFound');
     }
 
     if (data.email && data.email !== staff.email) {
       const emailOwner = await this.staffRepository.getStaffByEmail(data.email);
 
       if (emailOwner) {
-        throw new ConflictException('');
+        throw new ConflictException('main.error.staff.emailExists');
       }
     }
 
@@ -71,11 +75,11 @@ export class StaffService {
       const roles = await this.staffRepository.findRolesByIds(data.roleIds);
 
       if (roles.length !== data.roleIds.length) {
-        throw new BadRequestException('Yuborilgan rolelardan biri topilmadi');
+        throw new BadRequestException('main.error.staff.roleNotFound');
       }
 
       if (roles.some((role) => role.key === RoleKey.ADMIN)) {
-        throw new ForbiddenException('Foydalanuvchiga ADMIN roli biriktirilmaydi');
+        throw new ForbiddenException('main.error.staff.adminRoleForbidden');
       }
     }
 
@@ -83,7 +87,7 @@ export class StaffService {
       firstName: data.firstName ?? staff.firstName,
       lastName: data.lastName ?? staff.lastName,
       email: data.email?.toLowerCase() ?? staff.email,
-      password: data.password ? await bcrypt.hash(data.password, 12) : staff.password,
+      password: data.password ? await bcrypt.hash(data.password, BCRYPT_SALT) : staff.password,
     };
 
     await this.staffRepository.updateStaff(id, correctData, data.roleIds, assignedBy);
@@ -94,9 +98,10 @@ export class StaffService {
   async remove(id: number) {
     const staff = await this.staffRepository.getStaffById(id);
     if (!staff) {
-      throw new NotFoundException('');
+      throw new NotFoundException('main.error.staff.notFound');
     }
     await this.staffRepository.deleteStaffDto(id);
+    await this.redisService.delete(`admin:active_session:${id}`);
     return {};
   }
 }

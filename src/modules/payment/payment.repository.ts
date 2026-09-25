@@ -8,20 +8,9 @@ export class PaymentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findAll(query: TransactionListQueryDto) {
-    const {
-      page,
-      perPage,
-      search,
-      status,
-      from,
-      to,
-      minAmount,
-      maxAmount,
-    } = query;
+    const { page, perPage, search, status, from, to, minAmount, maxAmount } = query;
 
-    const conditions: Prisma.Sql[] = [
-      Prisma.sql`TRUE`,
-    ];
+    const conditions: Prisma.Sql[] = [Prisma.sql`TRUE`];
 
     if (search) {
       const searchValue = `%${search.trim()}%`;
@@ -66,24 +55,19 @@ export class PaymentRepository {
     }
 
     if (minAmount !== undefined) {
-      conditions.push(
-        Prisma.sql`t.amount >= ${minAmount}`,
-      );
+      conditions.push(Prisma.sql`t.amount >= ${minAmount}`);
     }
 
     if (maxAmount !== undefined) {
-      conditions.push(
-        Prisma.sql`t.amount <= ${maxAmount}`,
-      );
+      conditions.push(Prisma.sql`t.amount <= ${maxAmount}`);
     }
 
     const where = Prisma.join(conditions, ' AND ');
     const offset = (page - 1) * perPage;
 
-    const [data, countResult] =
-      await this.prisma.$transaction([
-        this.prisma.$queryRaw<any[]>(
-          Prisma.sql`
+    const [data, countResult] = await this.prisma.$transaction([
+      this.prisma.$queryRaw<any[]>(
+        Prisma.sql`
             SELECT
               t.id,
               t.reference,
@@ -100,31 +84,28 @@ export class PaymentRepository {
             LIMIT ${perPage}
             OFFSET ${offset}
           `,
-        ),
+      ),
 
-        this.prisma.$queryRaw<Array<{ total: bigint }>>(
-          Prisma.sql`
+      this.prisma.$queryRaw<Array<{ total: bigint }>>(
+        Prisma.sql`
             SELECT
               COUNT(*)::bigint AS total
             FROM transactions t
             WHERE ${where}
           `,
-        ),
-      ]);
+      ),
+    ]);
 
     return {
       data,
-      totalItems: Number(
-        countResult[0]?.total ?? 0,
-      ),
+      totalItems: Number(countResult[0]?.total ?? 0),
       currentPage: page,
       perPage,
     };
   }
 
   async getSummary() {
-    const [summary] =
-      await this.prisma.$queryRaw<any[]>`
+    const [summary] = await this.prisma.$queryRaw<any[]>`
         SELECT
           COUNT(*)::integer AS "totalTransactions",
 
@@ -159,8 +140,7 @@ export class PaymentRepository {
         FROM transactions;
       `;
 
-    const daily =
-      await this.prisma.$queryRaw<any[]>`
+    const daily = await this.prisma.$queryRaw<any[]>`
         SELECT
           DATE(created_at) AS date,
           COUNT(*)::integer AS count,
