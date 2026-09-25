@@ -63,6 +63,10 @@ export class StaffService {
       throw new NotFoundException('main.error.staff.notFound');
     }
 
+    if (staff.roles.some((item) => item.role.key === RoleKey.ADMIN)) {
+      throw new ForbiddenException('main.error.staff.adminProtected');
+    }
+
     if (data.email && data.email !== staff.email) {
       const emailOwner = await this.staffRepository.getStaffByEmail(data.email);
 
@@ -96,10 +100,15 @@ export class StaffService {
   }
 
   async remove(id: number) {
-    const staff = await this.staffRepository.getStaffById(id);
+    const staff = await this.staffRepository.getStaffForUpdate(id);
     if (!staff) {
       throw new NotFoundException('main.error.staff.notFound');
     }
+
+    if (staff.roles.some((item) => item.role.key === RoleKey.ADMIN)) {
+      throw new ForbiddenException('main.error.staff.adminProtected');
+    }
+
     await this.staffRepository.deleteStaffDto(id);
     await this.redisService.delete(`admin:active_session:${id}`);
     return {};

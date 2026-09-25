@@ -22,7 +22,8 @@
       "notFound": "Xodim topilmadi.",
       "emailExists": "Bu email allaqachon ro‘yxatdan o‘tgan.",
       "roleNotFound": "Ko‘rsatilgan rollardan biri topilmadi.",
-      "adminRoleForbidden": "ADMIN rolini bu amal orqali biriktirib bo‘lmaydi."
+      "adminRoleForbidden": "ADMIN rolini bu amal orqali biriktirib bo‘lmaydi.",
+      "adminProtected": "ADMIN xodimni bu bo‘lim orqali o‘zgartirish yoki o‘chirish mumkin emas."
     },
     "role": {
       "notFound": "Rol topilmadi.",

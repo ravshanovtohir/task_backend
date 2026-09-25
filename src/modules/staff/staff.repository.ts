@@ -198,6 +198,13 @@ export class StaffRepository {
         lastName: true,
         email: true,
         password: true,
+        roles: {
+          select: {
+            role: {
+              select: { key: true },
+            },
+          },
+        },
       },
     });
   }
